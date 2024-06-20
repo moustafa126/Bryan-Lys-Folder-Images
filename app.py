@@ -13,10 +13,11 @@ def load_model(model_path):
     return model
 
 # Function to perform inference and draw bounding boxes
-def detect_objects(image_path, model):
-    results = model(image_path)
+def detect_objects(image_path, model, conf_threshold):
+    # Set the confidence threshold based on user input
+    results = model(image_path, conf=conf_threshold)
     im_array = results[0].plot()  # plot a BGR numpy array of predictions
-    im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
+    im = Image.fromarray(im_array[..., ::-1])  # Convert to RGB PIL image
     return im
 
 # Streamlit app
@@ -50,6 +51,9 @@ model_options_onnx = [
 model_options = model_options_pt
 model_choice = st.selectbox("Choose a model", model_options)
 
+# Confidence threshold input slider
+conf_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.5, 0.01)
+
 # File uploader to upload multiple images
 uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
@@ -65,7 +69,7 @@ if st.button("Submit") and uploaded_files:
             f.write(uploaded_file.getbuffer())
         
         # Perform object detection
-        image_with_boxes = detect_objects("temp_image.jpg", model)
+        image_with_boxes = detect_objects("temp_image.jpg", model, conf_threshold)
 
         # Display the image with bounding boxes
         st.image(image_with_boxes, caption=f'Detected Dirt in Sinks {uploaded_file.name}', use_column_width=True)
