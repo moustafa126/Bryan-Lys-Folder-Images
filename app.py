@@ -1,4 +1,8 @@
 import streamlit as st
+# Install libGL.so.1 if it's missing
+if not os.path.isfile('/usr/lib/x86_64-linux-gnu/libGL.so.1'):
+    os.system('sudo apt-get update && sudo apt-get install -y libgl1-mesa-glx')
+    
 from ultralytics import YOLO
 from PIL import Image
 import os
